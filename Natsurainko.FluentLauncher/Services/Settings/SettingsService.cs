@@ -113,7 +113,7 @@ public partial class SettingsService : SettingsContainer
 
     #region Appearance Background Settings
 
-    [SettingItem(Default = 1, Converter = typeof(JsonStringConverter<int>))]
+    [SettingItem(Default = 0, Converter = typeof(JsonStringConverter<int>))]
     public partial int BackgroundMode { get; set; }
 
     [SettingItem(Default = 0, Converter = typeof(JsonStringConverter<int>))]
@@ -135,7 +135,7 @@ public partial class SettingsService : SettingsContainer
 
     #region Appearance Mask Settings
 
-    [SettingItem(Default = true, Converter = typeof(JsonStringConverter<bool>))]
+    [SettingItem(Default = false, Converter = typeof(JsonStringConverter<bool>))]
     public partial bool UseBackgroundMask { get; set; }
 
     #endregion

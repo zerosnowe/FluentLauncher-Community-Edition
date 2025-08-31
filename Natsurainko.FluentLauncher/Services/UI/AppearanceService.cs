@@ -16,7 +16,7 @@ internal class AppearanceService
 {
     private readonly SettingsService _settingsService;
 
-    public event EventHandler? BackgroundReloaded;
+    public event EventHandler<int>? BackgroundReloaded;
 
     public AppearanceService(SettingsService settingsService)
     {
@@ -106,18 +106,18 @@ internal class AppearanceService
                 break;
         }
 
-        if (_settingsService.BackgroundMode == 3 || _settingsService.BackgroundMode == 2)
-        {
-            Set(control.Resources, "NavigationViewContentBackground", new SolidColorBrush(Colors.Transparent));
-            Set(control.Resources, "NavigationViewContentGridBorderThickness", new Thickness(0));
-            Set(control.Resources, "BackgroundBorder", new Thickness(0));
-        }
-        else
-        {
-            Set(control.Resources, "NavigationViewContentBackground", App.Current.Resources["LayerFillColorDefaultBrush"]);
-            Set(control.Resources, "NavigationViewContentGridBorderThickness", new Thickness(1, 1, 0, 0));
-            Set(control.Resources, "BackgroundBorder", new Thickness(0, 1, 0, 0));
-        }
+        //if (_settingsService.BackgroundMode == 3 || _settingsService.BackgroundMode == 2)
+        //{
+        //    Set(control.Resources, "NavigationViewContentBackground", new SolidColorBrush(Colors.Transparent));
+        //    Set(control.Resources, "NavigationViewContentGridBorderThickness", new Thickness(0));
+        //    Set(control.Resources, "BackgroundBorder", new Thickness(0));
+        //}
+        //else
+        //{
+        //    Set(control.Resources, "NavigationViewContentBackground", App.Current.Resources["LayerFillColorDefaultBrush"]);
+        //    Set(control.Resources, "NavigationViewContentGridBorderThickness", new Thickness(1, 1, 0, 0));
+        //    Set(control.Resources, "BackgroundBorder", new Thickness(0, 1, 0, 0));
+        //}
     }
 
     public void RegisterApp(App app)
@@ -213,20 +213,20 @@ internal class AppearanceService
                 break;
         }
 
-        if (backgroundMode == 3 || backgroundMode == 2)
-        {
-            Set(control.Resources, "NavigationViewContentBackground", new SolidColorBrush(Colors.Transparent));
-            Set(control.Resources, "NavigationViewContentGridBorderThickness", new Thickness(0));
-            Set(control.Resources, "BackgroundBorder", new Thickness(0));
-        }
-        else
-        {
-            Set(control.Resources, "NavigationViewContentBackground", App.Current.Resources["LayerFillColorDefaultBrush"]);
-            Set(control.Resources, "NavigationViewContentGridBorderThickness", new Thickness(1, 1, 0, 0));
-            Set(control.Resources, "BackgroundBorder", new Thickness(0, 1, 0, 0));
-        }
+        //if (backgroundMode == 3 || backgroundMode == 2)
+        //{
+        //    Set(control.Resources, "NavigationViewContentBackground", new SolidColorBrush(Colors.Transparent));
+        //    Set(control.Resources, "NavigationViewContentGridBorderThickness", new Thickness(0));
+        //    Set(control.Resources, "BackgroundBorder", new Thickness(0));
+        //}
+        //else
+        //{
+        //    Set(control.Resources, "NavigationViewContentBackground", App.Current.Resources["LayerFillColorDefaultBrush"]);
+        //    Set(control.Resources, "NavigationViewContentGridBorderThickness", new Thickness(1, 1, 0, 0));
+        //    Set(control.Resources, "BackgroundBorder", new Thickness(0, 1, 0, 0));
+        //}
 
-        BackgroundReloaded?.Invoke(this, new());
+        BackgroundReloaded?.Invoke(this, backgroundMode);
     }
 
     private void PropertyChanged(global::FluentLauncher.Infra.Settings.SettingsContainer sender, global::FluentLauncher.Infra.Settings.SettingChangedEventArgs e)

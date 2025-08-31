@@ -75,6 +75,9 @@ public sealed partial class ShellPage : Page, INavigationProvider, INotifyProper
 
             NavigationViewControl.PaneDisplayMode = NavigationViewPaneDisplayMode.LeftMinimal;
             TopNavViewPaneToggleButtonsBorder.Width = 84;
+
+            MicaFrameBackground.Margin = new Thickness(0, 48, 0, 0);
+            MicaFrameBackground.BorderThickness = new Thickness(0, 1, 0, 0);
         }
         else
         {
@@ -85,6 +88,9 @@ public sealed partial class ShellPage : Page, INavigationProvider, INotifyProper
 
             NavigationViewControl.PaneDisplayMode = NavigationViewPaneDisplayMode.LeftCompact;
             TopNavViewPaneToggleButtonsBorder.Width = 48;
+
+            MicaFrameBackground.Margin = new Thickness(48, 0, 0, 0);
+            MicaFrameBackground.BorderThickness = new Thickness(1, 0, 0, 0);
         }
 
         UpdateSearchBoxArea();
@@ -211,7 +217,11 @@ public sealed partial class ShellPage : Page, INavigationProvider, INotifyProper
     #endregion
 
     #region Services Events
-    private void BackgroundReloaded(object? sender, EventArgs e) => BlurBorder.Opacity = (_settings.BackgroundMode == 3) ? 1 : 0;
+    private void BackgroundReloaded(object? sender, int backgroundMode)
+    {
+        BlurBorder.Opacity = (_settings.BackgroundMode == 3) ? 1 : 0;
+        MicaFrameBackground.Visibility = (backgroundMode == 0 && !_settings.UseBackgroundMask) ? Visibility.Visible : Visibility.Collapsed;
+    }
 
     private void UseBackgroundMaskChanged(SettingsContainer sender, SettingChangedEventArgs e)
     {
@@ -221,6 +231,7 @@ public sealed partial class ShellPage : Page, INavigationProvider, INotifyProper
             _settings.UseBackgroundMask ? Visibility.Visible : Visibility.Collapsed;
 
         SearchBoxAreaGrid.Shadow = _settings.UseBackgroundMask ? SharedShadow : null;
+        MicaFrameBackground.Visibility = (_settings.BackgroundMode == 0 && !_settings.UseBackgroundMask) ? Visibility.Visible : Visibility.Collapsed;
     }
 
     #endregion
@@ -234,6 +245,8 @@ public sealed partial class ShellPage : Page, INavigationProvider, INotifyProper
         TopNavViewPaneBackground.Visibility =
         SearchBoxAreaBackgroundBorder.Visibility =
             _settings.UseBackgroundMask ? Visibility.Visible : Visibility.Collapsed;
+
+        MicaFrameBackground.Visibility = (_settings.BackgroundMode == 0 && !_settings.UseBackgroundMask) ? Visibility.Visible : Visibility.Collapsed;
 
         BlurBorder.OpacityTransition = new ScalarTransition()
         {

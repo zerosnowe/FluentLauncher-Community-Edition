@@ -73,7 +73,6 @@
             <Thickness x:Key="PageMarginWithInstallWizardPageStackPanel">10,20,10,0</Thickness>
 
             <CornerRadius x:Key="NavigationViewContentGridCornerRadius">0</CornerRadius>
-            <Thickness x:Key="BackgroundBorder">0,1,0,0</Thickness>
             <CornerRadius x:Key="NavigationViewOverlayCornerRadius">8,8,8,8</CornerRadius>
 
             <converters:JavaIconConverter x:Key="JavaIconConverter" />

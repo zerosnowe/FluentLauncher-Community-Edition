@@ -34,13 +34,14 @@ public sealed partial class HomePage : Page
                 : new SolidColorBrush(Color.FromArgb(255, 255, 255, 255));
 
             LaunchButton.Translation += new System.Numerics.Vector3(0, 0, 16);
-            InstanceSelectorArea.Translation += new System.Numerics.Vector3(0, 0, 16);
-            AccountSelectorArea.Translation += new System.Numerics.Vector3(0, 0, 16);
-            LaunchingInfoArea.Translation += new System.Numerics.Vector3(0, 0, 16);
 
-            InstanceSelectorArea.Background = themeDictionaries["NavigationViewUnfoldedPaneBackground"] as AcrylicBrush;
-            AccountSelectorArea.Background = themeDictionaries["NavigationViewUnfoldedPaneBackground"] as AcrylicBrush;
-            LaunchingInfoArea.Background = themeDictionaries["NavigationViewUnfoldedPaneBackground"] as AcrylicBrush;
+            foreach (var border in new Border[] { InstanceSelectorArea, AccountSelectorArea, LaunchingInfoArea })
+            {
+                border.Translation += new System.Numerics.Vector3(0, 0, 16);
+                border.Background = themeDictionaries["NavigationViewUnfoldedPaneBackground"] as AcrylicBrush;
+                border.BorderThickness = new Thickness(1);
+                border.BorderBrush = themeDictionaries["ButtonBorderBrushPointerOver"] as Brush;
+            }
 
             AccountSelectorButton.Foreground = foregroundBrush;
 
@@ -52,9 +53,12 @@ public sealed partial class HomePage : Page
                     ? new SolidColorBrush(Color.FromArgb(255, 26, 26, 26))
                     : new SolidColorBrush(Color.FromArgb(255, 255, 255, 255));
 
-                InstanceSelectorArea.Background = themeDictionaries["NavigationViewUnfoldedPaneBackground"] as AcrylicBrush;
-                AccountSelectorArea.Background = themeDictionaries["NavigationViewUnfoldedPaneBackground"] as AcrylicBrush;
-                LaunchingInfoArea.Background = themeDictionaries["NavigationViewUnfoldedPaneBackground"] as AcrylicBrush;
+                foreach (var border in new Border[] { InstanceSelectorArea, AccountSelectorArea, LaunchingInfoArea })
+                {
+                    border.Background = themeDictionaries["NavigationViewUnfoldedPaneBackground"] as AcrylicBrush;
+                    border.BorderThickness = new Thickness(1);
+                    border.BorderBrush = themeDictionaries["ButtonBorderBrushPointerOver"] as Brush;
+                }
 
                 AccountSelectorButton.Foreground = foregroundBrush;
             };
