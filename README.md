@@ -23,9 +23,10 @@
 + [x] 全版本 Minecraft 实例启动支持 
 + [x] 多线程并行补全游戏依赖资源
 + [x] 自动查找已安装的 Java 运行时
-+ [x] 通过 Windows 任务栏快速启动游戏
++ [x] 通过快捷方式或 Windows 任务栏（开始菜单）快速启动游戏
 + [x] 自定义启动器外观（包括多种背景、主题色）
 + [x] 获取 Minecraft 官方新闻资讯
++ [x] 导入 CurseForge \ Modrinth 格式整合包 
 
 ### 验证方案
 + [x] 微软验证
@@ -44,6 +45,7 @@
 + [x] 支持从 Modrinth 下载资源
 + [x] 支持 [Bmcl Api](https://bmclapidoc.bangbang93.com/) 第三方镜像源下载
 + [x] 支持从 [MCIM](https://github.com/mcmod-info-mirror/mcim-api) 获取模组描述翻译
++ [x] 支持部分资源使用中文检索词
 
 ### 预览通道功能
 + [x] 支持启动器应用自更新
