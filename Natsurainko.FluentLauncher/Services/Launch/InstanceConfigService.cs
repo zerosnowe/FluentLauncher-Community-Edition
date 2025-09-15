@@ -51,6 +51,7 @@ internal class InstanceConfigService
             instanceConfig = JsonNode.Parse(File.ReadAllText(configFile))
                 .Deserialize(InstanceConfigSerializerContext.Default.InstanceConfig)
                 ?? throw new InvalidDataException();
+            instanceConfig.FilePath = configFile;
         }
         catch
         {

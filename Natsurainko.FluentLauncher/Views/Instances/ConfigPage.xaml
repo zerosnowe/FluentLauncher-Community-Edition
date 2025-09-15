@@ -173,7 +173,10 @@
                                 <DataTemplate x:DataType="x:String">
                                     <controls:SettingsCard>
                                         <controls:SettingsCard.Header>
-                                            <TextBlock Text="{x:Bind}" TextTrimming="CharacterEllipsis" />
+                                            <TextBlock
+                                                IsTextSelectionEnabled="True"
+                                                Text="{x:Bind}"
+                                                TextTrimming="CharacterEllipsis" />
                                         </controls:SettingsCard.Header>
                                         <Button Grid.Column="2" CommandParameter="{x:Bind}">
                                             <StackPanel Orientation="Horizontal" Spacing="5">
