@@ -16,6 +16,7 @@ using System.Linq;
 using System.Text.Json;
 using System.Text.Json.Nodes;
 using System.Threading.Tasks;
+using static Natsurainko.FluentLauncher.Services.UI.SearchProviderService;
 
 namespace Natsurainko.FluentLauncher.ViewModels.Downloads.Instances;
 
@@ -27,6 +28,7 @@ internal partial class DefaultViewModel(
     INotificationService notificationService) : PageVM, INavigationAware
 {
     private string _versionManifestJson = null!;
+    private BindedSearchProvider? _bindedSearchProvider;
 
     public VersionManifestItem[] AllInstances { get; private set; } = null!;
 
@@ -61,7 +63,8 @@ internal partial class DefaultViewModel(
 
     void INavigationAware.OnNavigatedTo(object? parameter)
     {
-        searchProviderService.OccupyQueryReceiver(this, SearchReceiveHandle);
+        _bindedSearchProvider = searchProviderService.BindProvider(this);
+        _bindedSearchProvider.BindQuerySubmition(SearchReceiveHandle);
 
         if (parameter is string searchInstanceId)
             SearchQuery = searchInstanceId;
@@ -72,6 +75,17 @@ internal partial class DefaultViewModel(
             ParseVersionManifestTask,
             "cache-interfaces\\piston-meta.mojang.com\\version_manifest_v2.json")
         .ContinueWith(ParseVersionManifestTask!);
+    }
+
+    void INavigationAware.OnNavigatedFrom()
+    {
+        _bindedSearchProvider?.Dispose();
+
+        FilteredInstances = null!;
+        AllInstances = null!;
+        LatestRelease = LatestSnapshot = null!;
+
+        GC.Collect();
     }
 
     [RelayCommand]
@@ -103,7 +117,7 @@ internal partial class DefaultViewModel(
     [RelayCommand]
     void ClearSearchQuery()
     {
-        searchProviderService.ClearSearchBox();
+        _bindedSearchProvider?.ClearInput();
         SearchReceiveHandle(string.Empty);
     }
 
@@ -175,15 +189,6 @@ internal partial class DefaultViewModel(
             FilteredInstances = new(filteredInstances);
             SearchQuery = query;
         });
-    }
-
-    protected override void OnUnloaded()
-    {
-        FilteredInstances = null!;
-        AllInstances = null!;
-        LatestRelease = LatestSnapshot = null!;
-
-        GC.Collect();
     }
 }
 

@@ -58,6 +58,9 @@ public class WinUINavigationService : INavigationService
 
     public void GoBack()
     {
+        // Before navigation starts
+        RecursiveOnNavigatedFrom(NavigationProvider);
+
         Frame.GoBack();
         _forwardStack.Push(_current);
         _current = _backStack.Pop();
@@ -67,6 +70,9 @@ public class WinUINavigationService : INavigationService
 
     public void GoForward()
     {
+        // Before navigation starts
+        RecursiveOnNavigatedFrom(NavigationProvider);
+
         Frame.GoForward();
         _backStack.Push(_current);
         _current = _forwardStack.Pop();
@@ -77,8 +83,7 @@ public class WinUINavigationService : INavigationService
     public void NavigateTo(string key, object? parameter = null)
     {
         // Before navigation starts
-        if ((Frame.Content as Page)?.DataContext is INavigationAware vmBefore)
-            vmBefore.OnNavigatedFrom();
+        RecursiveOnNavigatedFrom(NavigationProvider);
 
         // Navigation
         var pageInfo = _pageProvider.RegisteredPages[key];
@@ -136,5 +141,15 @@ public class WinUINavigationService : INavigationService
                 vmAfter.OnNavigatedTo(parameter);
             }
         }
+    }
+
+    private static void RecursiveOnNavigatedFrom(INavigationProvider navigationProvider)
+    {
+        if (navigationProvider.NavigationControl is not Frame frame) return;
+
+        if (frame.Content is INavigationProvider subNavigationProvider)
+            RecursiveOnNavigatedFrom(subNavigationProvider);
+        if (frame.Content is Page { DataContext: INavigationAware vmBefore })
+            vmBefore.OnNavigatedFrom();
     }
 }

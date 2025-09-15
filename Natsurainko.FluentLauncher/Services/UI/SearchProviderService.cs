@@ -1,57 +1,42 @@
-﻿using CommunityToolkit.Mvvm.ComponentModel;
-using Microsoft.UI.Xaml.Controls;
+﻿using Microsoft.UI.Xaml.Controls;
 using Natsurainko.FluentLauncher.Utils.Extensions;
 using Nrk.FluentCore.GameManagement;
 using Nrk.FluentCore.GameManagement.Installer;
 using Nrk.FluentCore.GameManagement.Instances;
-using Nrk.FluentCore.Resources;
 using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using System.Reactive.Linq;
 using System.Text.Json.Nodes;
 using System.Threading.Tasks;
 using Windows.ApplicationModel;
+using Windows.Foundation;
 using StringComparer = Natsurainko.FluentLauncher.Utils.StringComparer;
 
 namespace Natsurainko.FluentLauncher.Services.UI;
 
-public partial class SearchProviderService : ObservableObject
+public partial class SearchProviderService
 {
+    private bool _isInitialized = false;
     private AutoSuggestBox _autoSuggestBox = null!;
 
-    private readonly Dictionary<object, Func<string, IEnumerable<Suggestion>>> SuggestionProviders = [];
+    public object? CurrentOwner { get; private set; }
 
-    public object? QueryReceiverOwner { get; private set; }
+    public bool IsBinded { get; private set; }
 
-    public Action<string>? QueryReceiver { get; private set; }
-
-    public void BindingSearchBox(AutoSuggestBox autoSuggestBox)
+    public void Initialize(AutoSuggestBox autoSuggestBox)
     {
         _autoSuggestBox = autoSuggestBox;
         _autoSuggestBox.SuggestionChosen += AutoSuggestBox_SuggestionChosen;
-        _autoSuggestBox.TextChanged += AutoSuggestBox_TextChanged;
-        _autoSuggestBox.QuerySubmitted += AutoSuggestBox_QuerySubmitted;
+        //_autoSuggestBox.TextChanged += AutoSuggestBox_TextChanged;
+        //_autoSuggestBox.QuerySubmitted += AutoSuggestBox_QuerySubmitted;
 
         _autoSuggestBox.UpdateTextOnSelect = false;
-    }
+        _autoSuggestBox.IsEnabled = false;
+        _autoSuggestBox.SetValue(TextBox.IsSpellCheckEnabledProperty, false);
 
-    #region AutoSuggestBox Events
-
-    private void AutoSuggestBox_TextChanged(AutoSuggestBox sender, AutoSuggestBoxTextChangedEventArgs args)
-    {
-        if (string.IsNullOrEmpty(sender.Text))
-        {
-            _autoSuggestBox.ItemsSource = null;
-            return;
-        }
-
-        var suggestions = new List<Suggestion>();
-
-        foreach (var provider in SuggestionProviders.Values)
-            suggestions.AddRange(provider(sender.Text));
-
-        _autoSuggestBox.ItemsSource = suggestions;
+        _isInitialized = true;
     }
 
     private void AutoSuggestBox_SuggestionChosen(AutoSuggestBox sender, AutoSuggestBoxSuggestionChosenEventArgs args)
@@ -62,40 +47,95 @@ public partial class SearchProviderService : ObservableObject
         }
     }
 
-    private void AutoSuggestBox_QuerySubmitted(AutoSuggestBox sender, AutoSuggestBoxQuerySubmittedEventArgs args)
+    public BindedSearchProvider BindProvider(object owner)
     {
-        if (args.ChosenSuggestion is Suggestion suggestion)
+        if (!_isInitialized) throw new InvalidOperationException("SearchProviderService is not initialized.");
+        if (IsBinded) throw new InvalidOperationException("SearchProviderService is already binded to another owner.");
+
+        return new(this, owner);
+    }
+
+    public partial class BindedSearchProvider : IDisposable
+    {
+        private readonly SearchProviderService _service;
+        private bool _suggestionsSourceBinded = false;
+        private bool _querySubmitionBinded = false;
+
+        private IDisposable? _suggestionsSourceBinding;
+        private IDisposable? _querySubmitionBinding;
+
+        public AutoSuggestBox SearchBox => _service._autoSuggestBox;
+
+        public BindedSearchProvider(SearchProviderService service, object owner)
         {
-            return;
+            _service = service;
+            _service.CurrentOwner = owner;
+            _service.IsBinded = true;
+
+            SearchBox.IsEnabled = true;
         }
 
-        if (QueryReceiverOwner != null)
-            QueryReceiver!(sender.Text);
+        public void BindQuerySubmition(Action<string> action)
+        {
+            if (_querySubmitionBinded)
+                throw new InvalidOperationException("Query submition already binded.");
+
+            _querySubmitionBinding = Observable.FromEventPattern<TypedEventHandler<AutoSuggestBox, AutoSuggestBoxQuerySubmittedEventArgs>, AutoSuggestBoxQuerySubmittedEventArgs>(
+                handler => SearchBox.QuerySubmitted += handler,
+                handler => SearchBox.QuerySubmitted -= handler)
+                .Where(e => e.EventArgs.ChosenSuggestion is null)
+                .Select(e => ((AutoSuggestBox)e.Sender!).Text.Trim())
+                //.Where(query => !string.IsNullOrEmpty(query))
+                .ObserveOnDispatcherQueue(App.DispatcherQueue)
+                .Subscribe(action);
+
+            _querySubmitionBinded = true;
+        }
+
+        public void BindSuggestionsSource(Func<string, IEnumerable<Suggestion>> func)
+        {
+            if (_suggestionsSourceBinded)
+                throw new InvalidOperationException("Suggestions source already binded.");
+
+            _suggestionsSourceBinding = Observable.FromEventPattern<TypedEventHandler<AutoSuggestBox, AutoSuggestBoxTextChangedEventArgs>, AutoSuggestBoxTextChangedEventArgs>(
+                handler => SearchBox.TextChanged += handler,
+                handler => SearchBox.TextChanged -= handler)
+                .Throttle(TimeSpan.FromSeconds(0.15))
+                .ObserveOnDispatcherQueue(App.DispatcherQueue)
+                //.Where(e => e.EventArgs.Reason == AutoSuggestionBoxTextChangeReason.UserInput)
+                .Select(e => ((AutoSuggestBox)e.Sender!).Text.Trim())
+                //.Where(query => !string.IsNullOrEmpty(query))
+                .DistinctUntilChanged()
+                .SubscribeOnDispatcherQueue(App.DispatcherQueue)
+                .Subscribe(query => SearchBox.ItemsSource = func(query));
+
+            _suggestionsSourceBinded = true;
+        }
+
+        public void ClearInput() => SearchBox.Text = string.Empty;
+
+        public void Dispose()
+        {
+            if (_suggestionsSourceBinded)
+            {
+                _suggestionsSourceBinding?.Dispose();
+                _suggestionsSourceBinded = false;
+            }
+
+            if (_querySubmitionBinded)
+            {
+                _querySubmitionBinding?.Dispose();
+                _querySubmitionBinded = false;
+            }
+
+            _service.CurrentOwner = null;
+            _service.IsBinded = false;
+
+            ClearInput();
+            SearchBox.IsEnabled = false;
+            SearchBox.ItemsSource = null;
+        }
     }
-
-    #endregion
-
-    public void RegisterSuggestionProvider<TProvider>(TProvider provider, Func<string, IEnumerable<Suggestion>> func)
-        where TProvider : notnull
-    {
-        SuggestionProviders.Add(provider, func);
-    }
-
-    public void UnregisterSuggestionProvider<TProvider>(TProvider provider) where TProvider : notnull
-    {
-        SuggestionProviders.Remove(provider);
-    }
-
-    public bool ContainsSuggestionProvider<TProvider>(TProvider _) where TProvider : notnull
-        => SuggestionProviders.ContainsKey(typeof(TProvider));
-
-    public void OccupyQueryReceiver<TReceiver>(TReceiver provider, Action<string> action)
-    {
-        QueryReceiverOwner = provider;
-        QueryReceiver = action;
-    }
-
-    public void ClearSearchBox() => _autoSuggestBox.Text = string.Empty;
 }
 
 public class Suggestion

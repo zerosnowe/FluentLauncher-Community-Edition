@@ -2,6 +2,7 @@
 using CommunityToolkit.Mvvm.Input;
 using CommunityToolkit.Mvvm.Messaging;
 using FluentLauncher.Infra.UI.Dialogs;
+using FluentLauncher.Infra.UI.Navigation;
 using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Controls;
 using Natsurainko.FluentLauncher.Models;
@@ -20,11 +21,14 @@ using System.Collections.ObjectModel;
 using System.ComponentModel;
 using System.Numerics;
 using System.Threading.Tasks;
+using static Natsurainko.FluentLauncher.Services.UI.SearchProviderService;
 
 #nullable disable
 namespace Natsurainko.FluentLauncher.ViewModels.Home;
 
-internal partial class HomeViewModel : PageVM, IRecipient<TrackLaunchTaskChangedMessage>, IRecipient<ActiveAccountChangedMessage>
+internal partial class HomeViewModel : PageVM, INavigationAware,
+    IRecipient<TrackLaunchTaskChangedMessage>, 
+    IRecipient<ActiveAccountChangedMessage>
 {
     private readonly GameService _gameService;
     private readonly AccountService _accountService;
@@ -35,6 +39,7 @@ internal partial class HomeViewModel : PageVM, IRecipient<TrackLaunchTaskChanged
 
     private bool _registeredListener = false;
     private static LaunchTaskViewModel _trackingTask = null;
+    private BindedSearchProvider _bindedSearchProvider;
 
     public ReadOnlyObservableCollection<MinecraftInstance> MinecraftInstances { get; private set; }
 
@@ -191,10 +196,10 @@ internal partial class HomeViewModel : PageVM, IRecipient<TrackLaunchTaskChanged
         }
     }
 
-    protected override void OnLoaded()
+    void INavigationAware.OnNavigatedTo(object parameter)
     {
-        if (!_searchProviderService.ContainsSuggestionProvider(this))
-            _searchProviderService.RegisterSuggestionProvider(this, ProviderSuggestions);
+        _bindedSearchProvider = _searchProviderService.BindProvider(this);
+        _bindedSearchProvider.BindSuggestionsSource(ProviderSuggestions);
 
         App.MainWindow.SizeChanged += SizeChanged;
 
@@ -214,9 +219,9 @@ internal partial class HomeViewModel : PageVM, IRecipient<TrackLaunchTaskChanged
 #endif
     }
 
-    protected override void OnUnloaded()
+    void INavigationAware.OnNavigatedFrom()
     {
-        _searchProviderService.UnregisterSuggestionProvider(this);
+        _bindedSearchProvider.Dispose();
 
         if (_registeredListener)
         {

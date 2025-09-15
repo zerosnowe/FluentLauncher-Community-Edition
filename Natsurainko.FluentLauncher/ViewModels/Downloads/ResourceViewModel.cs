@@ -22,6 +22,7 @@ using System.Net.Http;
 using System.Text.Json.Nodes;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
+using static Natsurainko.FluentLauncher.Services.UI.SearchProviderService;
 
 #nullable disable
 namespace Natsurainko.FluentLauncher.ViewModels.Downloads;
@@ -37,6 +38,7 @@ internal partial class ResourceViewModel(
 {
     private string _pageKey;
     private object _modResource = null!;
+    private BindedSearchProvider _bindedSearchProvider;
 
     #region Basic Properties
 
@@ -163,7 +165,8 @@ internal partial class ResourceViewModel(
 
     void INavigationAware.OnNavigatedTo(object parameter)
     {
-        searchProviderService.OccupyQueryReceiver(this, query =>
+        _bindedSearchProvider = searchProviderService.BindProvider(this);
+        _bindedSearchProvider.BindQuerySubmition(query =>
             GlobalNavigate(_pageKey.Replace("Resource", "Navigation"), query));
 
         if (parameter is CurseForgeResource curseForgeResource)
@@ -218,6 +221,8 @@ internal partial class ResourceViewModel(
         TryLoadDescription();
         TryGetLocalizedSummary();
     }
+
+    void INavigationAware.OnNavigatedFrom() => _bindedSearchProvider?.Dispose();
 
     [RelayCommand]
     void Download(int option)
@@ -410,7 +415,6 @@ internal partial class ResourceViewModel(
                 .Where(f => f.McVersion == SelectedVersion)
                 .Where(f => f.Loaders.Contains(SelectedLoader))];
         }
-        ;
     }
 
     [GeneratedRegex("[^A-Za-z0-9\\s]")]

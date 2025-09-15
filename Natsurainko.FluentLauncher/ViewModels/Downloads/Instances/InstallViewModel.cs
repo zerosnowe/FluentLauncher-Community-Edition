@@ -16,6 +16,7 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using static Natsurainko.FluentLauncher.Services.UI.SearchProviderService;
 
 namespace Natsurainko.FluentLauncher.ViewModels.Downloads.Instances;
 
@@ -24,6 +25,8 @@ internal partial class InstallViewModel(
     DownloadService downloadService,
     SearchProviderService searchProviderService) : PageVM, INavigationAware, IRecipient<InstanceLoaderQueryMessage>
 {
+    private BindedSearchProvider? _bindedSearchProvider;
+
     [ObservableProperty]
     public partial IEnumerable<InstanceLoaderItem> LoaderItems { get; set; } = [];
 
@@ -96,7 +99,8 @@ internal partial class InstallViewModel(
 
     async void INavigationAware.OnNavigatedTo(object? parameter)
     {
-        searchProviderService.OccupyQueryReceiver(this, query => GlobalNavigate("InstancesDownload/Navigation", query));
+        _bindedSearchProvider = searchProviderService.BindProvider(this);
+        _bindedSearchProvider.BindQuerySubmition(query => GlobalNavigate("InstancesDownload/Navigation", query));
 
         CurrentInstance = parameter as VersionManifestItem
             ?? throw new InvalidDataException();
@@ -106,6 +110,8 @@ internal partial class InstallViewModel(
         ModItems = await InstanceModItem.GetInstanceModItemsAsync(CurrentInstance);
         LoadingMods = false;
     }
+
+    void INavigationAware.OnNavigatedFrom() => _bindedSearchProvider?.Dispose();
 
     [RelayCommand(CanExecute = nameof(CanInstall))]
     void Install()

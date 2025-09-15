@@ -22,7 +22,6 @@ public sealed partial class ShellPage : Page, INavigationProvider, INotifyProper
     ShellViewModel VM => (ShellViewModel)DataContext;
 
     private readonly SettingsService _settings = App.GetService<SettingsService>();
-    private readonly SearchProviderService _searchProviderService = App.GetService<SearchProviderService>();
     private readonly IPageProvider pageProvider = App.GetService<IPageProvider>();
 
     private bool isUpdatingNavigationItemSelection = false;
@@ -58,6 +57,7 @@ public sealed partial class ShellPage : Page, INavigationProvider, INotifyProper
         App.MainWindow.SetTitleBar(AppTitleBar);
 
         ConfigureNavigationView();
+        UpdateSearchBoxArea();
         UpdateTitleBarDragArea();
     }
 
@@ -206,16 +206,6 @@ public sealed partial class ShellPage : Page, INavigationProvider, INotifyProper
 
     #endregion
 
-    #region TitleBar Controls Events
-
-    private void AutoSuggestBox_Loaded(object sender, RoutedEventArgs e)
-    {
-        _searchProviderService.BindingSearchBox(AutoSuggestBox);
-        UpdateSearchBoxArea();
-    }
-
-    #endregion
-
     #region Services Events
     private void BackgroundReloaded(object? sender, int backgroundMode)
     {
@@ -254,6 +244,8 @@ public sealed partial class ShellPage : Page, INavigationProvider, INotifyProper
         };
 
         App.GetService<AppearanceService>().BackgroundReloaded += BackgroundReloaded;
+        App.GetService<SearchProviderService>().Initialize(AutoSuggestBox);
+
         _settings.UseBackgroundMaskChanged += UseBackgroundMaskChanged;
     }
 

@@ -12,6 +12,7 @@ using System.Collections.ObjectModel;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
+using static Natsurainko.FluentLauncher.Services.UI.SearchProviderService;
 
 namespace Natsurainko.FluentLauncher.ViewModels.Downloads;
 
@@ -24,6 +25,7 @@ internal abstract partial class ResourceDefaultViewModel(
 {
     private string? _pageKey;
     private CancellationTokenSource? _cancellationTokenSource;
+    private BindedSearchProvider? _bindedSearchProvider;
     private bool depressCategoryChangedInvokeSearch = true;
 
     [ObservableProperty]
@@ -87,6 +89,26 @@ internal abstract partial class ResourceDefaultViewModel(
 
         if (parameter is string query)
             SearchQuery = query;
+
+        _bindedSearchProvider = searchProviderService.BindProvider(this);
+        _bindedSearchProvider.BindQuerySubmition(query => SearchReceiveHandle(query));
+        _bindedSearchProvider.BindSuggestionsSource(SuggestionProvider);
+    }
+
+    void INavigationAware.OnNavigatedFrom() 
+    {
+        _bindedSearchProvider?.Dispose();
+
+        _cancellationTokenSource?.Cancel();
+        _cancellationTokenSource?.Dispose();
+
+        GC.Collect();
+    }
+
+    protected override void OnLoaded()
+    {
+        SearchReceiveHandle(SearchQuery);
+        depressCategoryChangedInvokeSearch = false;
     }
 
     [RelayCommand]
@@ -95,7 +117,7 @@ internal abstract partial class ResourceDefaultViewModel(
     [RelayCommand]
     void ClearSearchQuery()
     {
-        searchProviderService.ClearSearchBox();
+        _bindedSearchProvider?.ClearInput();
         SearchReceiveHandle(string.Empty);
     }
 
@@ -161,26 +183,6 @@ internal abstract partial class ResourceDefaultViewModel(
 
         if (!Categories.Contains(SelectedCategory))
             SelectedCategory = Categories[0];
-    }
-
-    protected override void OnLoaded()
-    {
-        searchProviderService.OccupyQueryReceiver(this, query => SearchReceiveHandle(query));
-        searchProviderService.RegisterSuggestionProvider(this, SuggestionProvider);
-
-        SearchReceiveHandle(SearchQuery);
-
-        depressCategoryChangedInvokeSearch = false;
-    }
-
-    protected override void OnUnloaded()
-    {
-        searchProviderService.UnregisterSuggestionProvider(this);
-
-        _cancellationTokenSource?.Cancel();
-        _cancellationTokenSource?.Dispose();
-
-        GC.Collect();
     }
 
     private IEnumerable<Suggestion> SuggestionProvider(string query)

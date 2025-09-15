@@ -18,6 +18,7 @@ using System.Collections.ObjectModel;
 using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
+using static Natsurainko.FluentLauncher.Services.UI.SearchProviderService;
 
 namespace Natsurainko.FluentLauncher.ViewModels.Instances;
 
@@ -30,6 +31,8 @@ internal partial class DefaultViewModel : SettingsPageVM, ISettingsViewModel, IN
     private readonly SearchProviderService _searchProviderService;
     private readonly INotificationService _notificationService;
     private readonly IDialogActivationService<ContentDialogResult> _dialogActivationService;
+
+    private BindedSearchProvider? _bindedSearchProvider;
 
     public ReadOnlyObservableCollection<MinecraftInstance> MinecraftInstances { get; init; }
 
@@ -77,7 +80,15 @@ internal partial class DefaultViewModel : SettingsPageVM, ISettingsViewModel, IN
 
     partial void OnSortByIndexChanged(int value) => Task.Run(UpdateDisplayMinecraftInstances);
 
-    void INavigationAware.OnNavigatedTo(object? parameter) => Task.Run(UpdateDisplayMinecraftInstances);
+    void INavigationAware.OnNavigatedTo(object? parameter)
+    {
+        _bindedSearchProvider = _searchProviderService.BindProvider(this);
+        _bindedSearchProvider.BindSuggestionsSource(ProviderSuggestions);
+
+        Task.Run(UpdateDisplayMinecraftInstances);
+    }
+
+    void INavigationAware.OnNavigatedFrom() => _bindedSearchProvider?.Dispose();
 
     [RelayCommand]
     void GoToSettings() => GlobalNavigate("Settings/Navigation", "Settings/Launch");
@@ -143,16 +154,5 @@ internal partial class DefaultViewModel : SettingsPageVM, ISettingsViewModel, IN
             : [.. instances.OrderByDescending(x => x.GetConfig().LastLaunchTime)];
 
         Dispatcher.TryEnqueue(() => DisplayMinecraftInstances = list);
-    }
-
-    protected override void OnLoaded()
-    {
-        if (!_searchProviderService.ContainsSuggestionProvider(this))
-            _searchProviderService.RegisterSuggestionProvider(this, ProviderSuggestions);
-    }
-
-    protected override void OnUnloaded()
-    {
-        _searchProviderService.UnregisterSuggestionProvider(this);
     }
 }
