@@ -85,22 +85,29 @@ internal static class DependencyInjectionExtensions
 
         foreach (string file in Directory.EnumerateFiles(extensionsFolder, "FluentLauncher.Extension.*.dll", new EnumerationOptions() { RecurseSubdirectories = true}))
         {
-            var extensionAssembly = ApplicationExtensionHost.Current.GetExtensionAssembly(file);
-            Assemblies.Add(extensionAssembly);
-
-            foreach (IExtension instance in extensionAssembly.ForeignAssembly.GetExportedTypes()
-                .Where(type => type.IsAssignableTo(typeof(IExtension)))
-                .Select(type => Activator.CreateInstance(type) as IExtension)!)
+            try
             {
-                Instances.Add(instance);
+                var extensionAssembly = ApplicationExtensionHost.Current.GetExtensionAssembly(file);
+                Assemblies.Add(extensionAssembly);
 
-                instance.RegisteredPages.ToList()
-                    .ForEach(d => builder.Pages.WithPage(d.Key, d.Value.Item1, d.Value.Item2));
-                instance.RegisteredDialogs.ToList()
-                    .ForEach(d => builder.Dialogs.WithDialog(d.Key, d.Value.Item1, d.Value.Item2));
+                foreach (IExtension instance in extensionAssembly.ForeignAssembly.GetExportedTypes()
+                    .Where(type => type.IsAssignableTo(typeof(IExtension)))
+                    .Select(type => Activator.CreateInstance(type) as IExtension)!)
+                {
+                    Instances.Add(instance);
 
-                instance.SetExtensionFolder(new FileInfo(file).DirectoryName!);
-                builder.ConfigureServices(instance.ConfigureServices);
+                    instance.RegisteredPages.ToList()
+                        .ForEach(d => builder.Pages.WithPage(d.Key, d.Value.Item1, d.Value.Item2));
+                    instance.RegisteredDialogs.ToList()
+                        .ForEach(d => builder.Dialogs.WithDialog(d.Key, d.Value.Item1, d.Value.Item2));
+
+                    instance.SetExtensionFolder(new FileInfo(file).DirectoryName!);
+                    builder.ConfigureServices(instance.ConfigureServices);
+                }
+            }
+            catch (Exception ex)
+            {
+
             }
         }
 

@@ -25,8 +25,6 @@ class MessengerService(AccountService accountService, SettingsService settingsSe
         settingsService.DisplayThemeChanged += SettingsService_DisplayThemeChanged;
     }
 
-
-
     private void AccountService_ActiveAccountChanged(object? sender, Nrk.FluentCore.Authentication.Account? e)
     {
         if (e == null)
