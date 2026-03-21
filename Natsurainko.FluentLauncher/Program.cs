@@ -173,7 +173,7 @@ var app = builder.Build();
 AppHost = app.Host;
 
 HandleUriCommandParameters(ref args);
-await BuildRootCommand(app).InvokeAsync(args);
+await BuildRootCommand(app).Parse(args).InvokeAsync();
 
 internal partial class Program
 {
@@ -181,15 +181,14 @@ internal partial class Program
 
     public static IHost AppHost { get; private set; } = null!;
 
-    public static Option<string> MinecraftFolderOption { get; } = new(name: "--minecraftFolder") { IsRequired = true };
+    public static Option<string> MinecraftFolderOption { get; } = new(name: "--minecraftFolder") { Required = true };
 
-    public static Option<string> InstanceIdOption { get; } = new(name: "--instanceId") { IsRequired = true };
+    public static Option<string> InstanceIdOption { get; } = new(name: "--instanceId") { Required = true };
 
     public static RootCommand BuildRootCommand(WinUIApplication<App> application)
     {
         RootCommand rootCommand = [BuildSubCommand()];
-
-        rootCommand.SetHandler(async () =>
+        rootCommand.SetAction(async parseResult =>
         {
             Logger.Starting();
             await application.RunAsync();
@@ -200,16 +199,23 @@ internal partial class Program
 
     public static Command BuildSubCommand()
     {
-        var quickLaunchCommand = new Command("quickLaunch");
-        quickLaunchCommand.AddOption(MinecraftFolderOption);
-        quickLaunchCommand.AddOption(InstanceIdOption);
-        quickLaunchCommand.AddAlias("quicklaunch");
-
-        quickLaunchCommand.SetHandler(async (folder, instanceId) =>
+        Command quickLaunchCommand = new("quickLaunch")
         {
+            MinecraftFolderOption,
+            InstanceIdOption
+        };
+        quickLaunchCommand.Aliases.Add("quicklaunch");
+        quickLaunchCommand.SetAction(async parseResult =>
+        {
+            var folder = parseResult.GetValue(MinecraftFolderOption)!;
+            var instanceId = parseResult.GetValue(InstanceIdOption)!;
+
             ConfigureLanguage();
-            await AppHost.Services.GetService<QuickLaunchService>()!.LaunchFromArguments(folder, instanceId);
-        }, MinecraftFolderOption, InstanceIdOption);
+
+            await AppHost.Services
+                .GetRequiredService<QuickLaunchService>()
+                .LaunchFromArguments(folder, instanceId);
+        });
 
         return quickLaunchCommand;
     }

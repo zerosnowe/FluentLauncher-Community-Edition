@@ -31,8 +31,8 @@ internal class QuickLaunchService(
     {
         var parseResult = Program.BuildSubCommand().Parse(args);
 
-        string? minecraftFolder = parseResult.GetValueForOption(Program.MinecraftFolderOption);
-        string? instanceId = parseResult.GetValueForOption(Program.InstanceIdOption);
+        string? minecraftFolder = parseResult.GetValue(Program.MinecraftFolderOption);
+        string? instanceId = parseResult.GetValue(Program.InstanceIdOption);
 
         if (minecraftFolder == null || instanceId == null)
             return;
