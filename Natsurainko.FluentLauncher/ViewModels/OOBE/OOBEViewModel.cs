@@ -339,7 +339,7 @@ static partial class OOBEViewModelNotifications
     [Notification<InfoBar>(Title = "Notifications__FolderExisted", Message = "{path}")]
     public static partial void FolderExisted(this INotificationService notificationService, string path);
 
-    [Notification<InfoBar>(Title = "Notifications__FolderAdded", Message = "$path", Type = NotificationType.Success)]
+    [Notification<InfoBar>(Title = "Notifications__FolderAdded", Message = "{path}", Type = NotificationType.Success)]
     public static partial void FolderAdded(this INotificationService notificationService, string path);
 
     [Notification<InfoBar>(Title = "Notifications__OfficialFolderNotFound", Message = "{path}", Type = NotificationType.Error)]

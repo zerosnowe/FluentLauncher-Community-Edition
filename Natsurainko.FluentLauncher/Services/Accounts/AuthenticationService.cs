@@ -77,7 +77,7 @@ internal class AuthenticationService(HttpClient httpClient)
     #region Offline Authentication
 
     public OfflineAccount LoginOffline(string name, string? uuid)
-        => _offlineAuthenticator.Login(name, uuid == null ? null : Guid.Parse(uuid));
+        => _offlineAuthenticator.Login(name, string.IsNullOrEmpty(uuid) ? null : Guid.Parse(uuid));
 
     public OfflineAccount Refresh(OfflineAccount account)
         => _offlineAuthenticator.Refresh(account);
