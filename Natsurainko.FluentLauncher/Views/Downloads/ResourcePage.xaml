@@ -5,7 +5,6 @@
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
     xmlns:controls="using:CommunityToolkit.WinUI.Controls"
     xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
-    xmlns:labs="using:CommunityToolkit.Labs.WinUI.MarkdownTextBlock"
     xmlns:local="using:Natsurainko.FluentLauncher.Views.Downloads"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
     xmlns:resources="using:Nrk.FluentCore.Resources"
@@ -470,7 +469,7 @@
                                     x:Load="{x:Bind VM.LoadingDescription, Mode=OneWay}"
                                     IsActive="{x:Bind VM.LoadingDescription, Mode=OneWay}" />
 
-                                <labs:MarkdownTextBlock
+                                <controls:MarkdownTextBlock
                                     x:Name="DescriptionMarkdown"
                                     x:Load="{x:Bind VM.IsMarkdown, Mode=OneWay}"
                                     Background="Transparent"

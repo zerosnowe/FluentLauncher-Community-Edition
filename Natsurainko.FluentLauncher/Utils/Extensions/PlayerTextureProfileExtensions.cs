@@ -1,10 +1,10 @@
-﻿using HelixToolkit.SharpDX.Core;
-using HelixToolkit.SharpDX.Core.Assimp;
-using HelixToolkit.WinUI;
+﻿using HelixToolkit.SharpDX;
+using HelixToolkit.SharpDX.Assimp;
+using HelixToolkit.WinUI.SharpDX;
 using Natsurainko.FluentLauncher.Services.Storage;
 using Nrk.FluentCore.Authentication;
-using SharpDX;
 using SharpDX.Direct3D11;
+using SharpDX.Mathematics.Interop;
 using System;
 using System.Diagnostics.CodeAnalysis;
 using System.IO;
@@ -23,7 +23,7 @@ internal static class PlayerTextureProfileExtensions
         AddressV = TextureAddressMode.Wrap,
         AddressW = TextureAddressMode.Wrap,
         ComparisonFunction = Comparison.Never,
-        BorderColor = new Color4(0, 0, 0, 0),
+        BorderColor = new RawColor4(0, 0, 0, 0),
         MinimumLod = 0,
         MaximumLod = float.MaxValue,
     };

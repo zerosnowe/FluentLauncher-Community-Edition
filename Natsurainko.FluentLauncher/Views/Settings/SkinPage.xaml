@@ -5,7 +5,7 @@
     xmlns:controls="using:CommunityToolkit.WinUI.Controls"
     xmlns:converters="using:Natsurainko.FluentLauncher.Xaml.Converters"
     xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
-    xmlns:hx="using:HelixToolkit.WinUI"
+    xmlns:hx="using:HelixToolkit.WinUI.SharpDX"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
     xmlns:userControls="using:Natsurainko.FluentLauncher.UserControls"
     xmlns:xh="using:Natsurainko.FluentLauncher.Xaml"

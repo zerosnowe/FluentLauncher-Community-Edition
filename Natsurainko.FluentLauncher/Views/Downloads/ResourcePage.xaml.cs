@@ -1,4 +1,4 @@
-using CommunityToolkit.Labs.WinUI.MarkdownTextBlock;
+using CommunityToolkit.WinUI.Controls;
 using FluentLauncher.Infra.UI.Navigation;
 using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Controls;
