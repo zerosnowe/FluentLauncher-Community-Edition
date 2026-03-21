@@ -36,12 +36,30 @@ public partial class CustomLoggingScopeHttpMessageHandler(ILogger logger) : Dele
     {
         ArgumentNullException.ThrowIfNull(request);
 
-        var response = await base.SendAsync(request, cancellationToken);
+        try
+        {
+            var response = await base.SendAsync(request, cancellationToken).ConfigureAwait(false);
 
-        if (!response.IsSuccessStatusCode)
-            _logger.ProcessingHttpRequestFailed(request.Method, request.RequestUri, response.StatusCode);
+            if (!response.IsSuccessStatusCode)
+            {
+                _logger.ProcessingHttpRequestFailed(request.Method, request.RequestUri, response.StatusCode);
+            }
 
-        return response;
+            return response;
+        }
+        catch (HttpRequestException ex)
+        {
+            // Log the failure and return a non-success response so callers receive a HttpResponseMessage
+            // instead of an unhandled exception. This prevents the UI from crashing when transient
+            // network errors occur while still surfacing the failure via logs.
+            _logger.LogError(ex, "Processing HTTP request {httpMethod} {uri} failed - {error}", request.Method, request.RequestUri, ex.Message);
+
+            return new HttpResponseMessage(HttpStatusCode.ServiceUnavailable)
+            {
+                RequestMessage = request,
+                Content = new StringContent(string.Empty)
+            };
+        }
     }
 }
 

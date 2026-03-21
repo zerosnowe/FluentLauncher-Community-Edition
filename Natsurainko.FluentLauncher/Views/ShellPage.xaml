@@ -353,6 +353,10 @@
 
             <NavigationView.FooterMenuItems>
                 <NavigationViewItem
+                    Content="QuickLook"
+                    Icon="{xh:FontIcon Glyph=&#xE8A7;}"
+                    Tag="QuickLookWindow" />
+                <NavigationViewItem
                     x:Name="LaunchTaskNavigationViewItem"
                     x:Uid="ShellPage_NV_Item_5"
                     x:FieldModifier="public"

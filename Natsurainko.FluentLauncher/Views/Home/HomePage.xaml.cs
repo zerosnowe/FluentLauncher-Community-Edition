@@ -15,6 +15,7 @@ namespace Natsurainko.FluentLauncher.Views.Home;
 public sealed partial class HomePage : Page
 {
     private readonly SettingsService _settingsService = App.GetService<SettingsService>();
+    private DispatcherTimer? _newsCarouselTimer;
 
     HomeViewModel VM => (HomeViewModel)DataContext;
 
@@ -25,7 +26,7 @@ public sealed partial class HomePage : Page
 
     private void Page_Loaded(object sender, RoutedEventArgs e)
     {
-        var themeDictionaries = (App.Current.Resources.ThemeDictionaries[this.ActualTheme == ElementTheme.Light ? "Light" : "Dark"] as ResourceDictionary)!;
+        var themeDictionaries = App.Current.Resources;
 
         if (_settingsService.UseHomeControlsMask)
         {
@@ -47,7 +48,7 @@ public sealed partial class HomePage : Page
 
             this.ActualThemeChanged += (_, e) =>
             {
-                var themeDictionaries = (App.Current.Resources.ThemeDictionaries[this.ActualTheme == ElementTheme.Light ? "Light" : "Dark"] as ResourceDictionary)!;
+                var themeDictionaries = App.Current.Resources;
 
                 Brush foregroundBrush = this.ActualTheme == ElementTheme.Light
                     ? new SolidColorBrush(Color.FromArgb(255, 26, 26, 26))
@@ -66,10 +67,10 @@ public sealed partial class HomePage : Page
 
         if (_settingsService.HomeLaunchButtonSize == 1)
         {
-            LaunchButtonIcon.FontSize = 18;
-            LaunchButton.FontSize = 16;
-
-            LaunchButton.VerticalAlignment = VerticalAlignment.Stretch;
+            LaunchButtonIcon.FontSize = 22;
+            LaunchButton.Width = 56;
+            LaunchButton.Height = 56;
+            LaunchButton.CornerRadius = new CornerRadius(28);
         }
 
         InstanceSelectorGrid.TranslationTransition = new Vector3Transition()
@@ -91,10 +92,13 @@ public sealed partial class HomePage : Page
         };
 
         LaunchButton.Focus(FocusState.Programmatic);
+
+        StartNewsCarousel();
     }
 
     private void Page_Unloaded(object sender, RoutedEventArgs e)
     {
+        StopNewsCarousel();
         this.DataContext = null;
 
         InstancesListView.ItemsSource = null;
@@ -122,6 +126,39 @@ public sealed partial class HomePage : Page
             InstancesListView.MaxWidth = 430;
             InstancesListView.Width = 430;
         }
+    }
+
+    private void StartNewsCarousel()
+    {
+        if (_newsCarouselTimer is not null)
+            return;
+
+        _newsCarouselTimer = new DispatcherTimer
+        {
+            Interval = TimeSpan.FromSeconds(2)
+        };
+        _newsCarouselTimer.Tick += (_, _) =>
+        {
+            int count = VM.NewsCarouselCount;
+            if (count <= 1)
+                return;
+
+            int next = VM.CurrentNewsIndex + 1;
+            if (next >= count)
+                next = 0;
+
+            VM.CurrentNewsIndex = next;
+        };
+        _newsCarouselTimer.Start();
+    }
+
+    private void StopNewsCarousel()
+    {
+        if (_newsCarouselTimer is null)
+            return;
+
+        _newsCarouselTimer.Stop();
+        _newsCarouselTimer = null;
     }
 
     #region Converters Methods

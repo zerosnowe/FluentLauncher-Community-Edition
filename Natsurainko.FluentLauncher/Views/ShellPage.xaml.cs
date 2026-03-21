@@ -1,6 +1,7 @@
 using FluentLauncher.Infra.Settings;
 using FluentLauncher.Infra.UI.Navigation;
 using FluentLauncher.Infra.UI.Pages;
+using FluentLauncher.Infra.UI.Windows;
 using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Controls;
 using Microsoft.UI.Xaml.Navigation;
@@ -26,6 +27,7 @@ public sealed partial class ShellPage : Page, INavigationProvider, INotifyProper
 
     private bool isUpdatingNavigationItemSelection = false;
     private Grid PaneToggleButtonGrid = null!;
+    private object? _lastNavigationSelectedItem;
 
     public event PropertyChangedEventHandler? PropertyChanged;
 
@@ -57,6 +59,7 @@ public sealed partial class ShellPage : Page, INavigationProvider, INotifyProper
         App.MainWindow.SetTitleBar(AppTitleBar);
 
         ConfigureNavigationView();
+        _lastNavigationSelectedItem = NavigationViewControl.SelectedItem;
         UpdateSearchBoxArea();
         UpdateTitleBarDragArea();
     }
@@ -152,6 +155,22 @@ public sealed partial class ShellPage : Page, INavigationProvider, INotifyProper
         string pageTag = navigationViewItem.Tag.ToString()
             ?? throw new ArgumentNullException("The invoked item's tag is null.");
 
+        if (pageTag == "QuickLookWindow")
+        {
+            App.GetService<IActivationService>().ActivateWindow("QuickLookWindow");
+
+            if (_lastNavigationSelectedItem is not null)
+            {
+                isUpdatingNavigationItemSelection = true;
+                NavigationViewControl.SelectedItem = _lastNavigationSelectedItem;
+                navigationViewItem.IsSelected = false;
+                isUpdatingNavigationItemSelection = false;
+            }
+
+            return;
+        }
+
+        _lastNavigationSelectedItem = navigationViewItem;
         VM.NavigationService.NavigateTo(pageTag);
         OnPropertyChanged(nameof(CanGoBack));
     }
@@ -176,7 +195,9 @@ public sealed partial class ShellPage : Page, INavigationProvider, INotifyProper
 
                 string? tag = navigationViewItem.GetTag();
 
-                if (tag is not null && pageProvider.RegisteredPages[tag].PageType == e.SourcePageType)
+                if (tag is not null
+                    && pageProvider.RegisteredPages.ContainsKey(tag)
+                    && pageProvider.RegisteredPages[tag].PageType == e.SourcePageType)
                 {
                     if (navigationViewItem.Parent is NavigationViewItem parentItem)
                         parentItem.IsExpanded = true;

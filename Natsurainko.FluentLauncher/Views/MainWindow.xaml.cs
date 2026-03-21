@@ -8,6 +8,7 @@ using Natsurainko.FluentLauncher.Services.Settings;
 using Natsurainko.FluentLauncher.Services.UI;
 using Natsurainko.FluentLauncher.Services.UI.Messaging;
 using Natsurainko.FluentLauncher.Services.UI.Notification;
+using Natsurainko.FluentLauncher.Utils;
 using Natsurainko.FluentLauncher.Utils.Extensions;
 using Windows.Graphics;
 using Windows.UI.WindowManagement;
@@ -90,6 +91,9 @@ public sealed partial class MainWindow : WindowEx, INavigationProvider, IRecipie
 
         this.SizeChanged += MainWindow_SizeChanged;
         this.PositionChanged += MainWindow_PositionChanged;
+
+        QuickLookHotKey.Register();
+        this.Closed += (_, _) => QuickLookHotKey.Unregister();
 
         _logger.MainWindowInitialized();
     }

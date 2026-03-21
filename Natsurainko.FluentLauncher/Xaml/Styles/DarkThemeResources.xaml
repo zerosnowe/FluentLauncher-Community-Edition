@@ -1,0 +1,13 @@
+<ResourceDictionary xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+                    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
+    <SolidColorBrush x:Key="DeleteButtonBackground" Color="#3FFF0000" />
+    <SolidColorBrush x:Key="DeleteButtonBorder" Color="#59FF0000" />
+    <Color x:Key="AcrylicTintColor">Black</Color>
+    <SolidColorBrush x:Key="IconBorder" Color="#10FFFFFF" />
+    <AcrylicBrush
+        x:Key="NavigationViewUnfoldedPaneBackground"
+        FallbackColor="#AA222222"
+        TintColor="#222222"
+        TintLuminosityOpacity="0.5"
+        TintOpacity="0.0" />
+</ResourceDictionary>
