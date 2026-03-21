@@ -128,7 +128,7 @@ jobs:
 
           # Rename .msixsym to .appxsym to pass Partner Center validation
           # Move .appx to root directory for making .msixupload
-          mv "$directory\$packageName.msixsym" ".\$packageName.appxsym"
+          # mv "$directory\$packageName.msixsym" ".\$packageName.appxsym"
 
           # Move .msix for upload to artifacts
           mv ${{ env.Packages_Directory }}\*\*.msix "$packageName.msix"
