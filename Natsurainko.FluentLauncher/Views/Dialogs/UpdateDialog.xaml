@@ -4,7 +4,7 @@
     xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
     xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
-    xmlns:labs="using:CommunityToolkit.Labs.WinUI.MarkdownTextBlock"
+    xmlns:controls="using:CommunityToolkit.WinUI.Controls"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
     IsEnabled="{x:Bind VM.Enable, Mode=OneWay}"
     Style="{ThemeResource DefaultContentDialogStyle}"
@@ -75,7 +75,7 @@
                             </Grid>
                         </Expander.Header>
                         <ScrollViewer MaxHeight="275" CornerRadius="8">
-                            <labs:MarkdownTextBlock
+                            <controls:MarkdownTextBlock
                                 Background="Transparent"
                                 Config="{x:Bind MarkdownConfig}"
                                 Text="{x:Bind VM.ReleaseModel.Body, Mode=OneWay}" />
