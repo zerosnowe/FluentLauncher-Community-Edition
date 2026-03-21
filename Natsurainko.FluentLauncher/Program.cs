@@ -181,9 +181,9 @@ internal partial class Program
 
     public static IHost AppHost { get; private set; } = null!;
 
-    public static Option<string> MinecraftFolderOption { get; } = new(name: "--minecraftFolder") { Required = true };
+    public static Option<string> MinecraftFolderOption { get; } = new("--minecraftFolder") { Required = true };
 
-    public static Option<string> InstanceIdOption { get; } = new(name: "--instanceId") { Required = true };
+    public static Option<string> InstanceIdOption { get; } = new("--instanceId") { Required = true };
 
     public static RootCommand BuildRootCommand(WinUIApplication<App> application)
     {
