@@ -28,7 +28,7 @@
 + [x] 通过快捷方式或 Windows 任务栏（开始菜单）快速启动游戏
 + [x] 自定义启动器外观（包括多种背景、主题色）
 + [x] 获取 Minecraft 官方新闻资讯
-+ [x] 导入 CurseForge \ Modrinth 格式整合包 
++ [x] 导入 CurseForge \ Modrinth 格式整合包
 - [ ] 导出 Curseforge \ Modrinth整合包
 - [ ] 通过陶瓦联机功能联机
 
