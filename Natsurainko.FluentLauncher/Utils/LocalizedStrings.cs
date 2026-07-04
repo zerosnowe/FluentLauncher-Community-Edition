@@ -24,12 +24,34 @@ static partial class LocalizedStrings
     /// <returns></returns>
     public static string GetString(string key)
     {
-        return s_resourceMap.GetValue($"Resources/{key}").ValueAsString;
+        try
+        {
+            return s_resourceMap.GetValue($"Resources/{key}").ValueAsString;
+        }
+        catch (System.Runtime.InteropServices.COMException)
+        {
+            // NamedResource not found. Return a sensible fallback instead of letting the app crash.
+            // If key follows the pattern "...__text", return the trailing text; otherwise return the raw key.
+            if (string.IsNullOrEmpty(key))
+                return string.Empty;
+
+            int idx = key.LastIndexOf("__");
+            if (idx >= 0 && idx + 2 < key.Length)
+                return key.Substring(idx + 2);
+
+            return key;
+        }
+        catch
+        {
+            // Any other unexpected error: return key as fallback
+            return key ?? string.Empty;
+        }
     }
 
     public static string[] GetStrings(string key)
     {
-        return GetString(key).Split(";");
+        var s = GetString(key);
+        return string.IsNullOrEmpty(s) ? new string[0] : s.Split(";");
     }
 
     public static void ApplyLanguage(string language)

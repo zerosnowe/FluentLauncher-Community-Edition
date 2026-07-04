@@ -65,6 +65,11 @@ pages.WithPage<Views.Instances.InstancePage, ViewModels.Instances.InstanceViewMo
 pages.WithPage<Views.Instances.ConfigPage, ViewModels.Instances.ConfigViewModel>("Instances/Config");
 pages.WithPage<Views.Instances.ModPage, ViewModels.Instances.ModViewModel>("Instances/Mod");
 pages.WithPage<Views.Instances.SavePage, ViewModels.Instances.SaveViewModel>("Instances/Save");
+pages.WithPage<Views.Instances.ResourceManagementPage, ViewModels.Instances.ResourceManagementViewModel>("Instances/ResourcePacks");
+pages.WithPage<Views.Instances.ResourceManagementPage, ViewModels.Instances.ResourceManagementViewModel>("Instances/Shaders");
+pages.WithPage<Views.Instances.ResourceManagementPage, ViewModels.Instances.ResourceManagementViewModel>("Instances/Screenshots");
+pages.WithPage<Views.Instances.ResourceManagementPage, ViewModels.Instances.ResourceManagementViewModel>("Instances/Maps");
+pages.WithPage<Views.Instances.ResourceManagementPage, ViewModels.Instances.ResourceManagementViewModel>("Instances/Servers");
 
 // News page
 pages.WithPage<Views.News.NavigationPage, ViewModels.News.NavigationViewModel>("News/Navigation");
@@ -88,6 +93,10 @@ pages.WithPage<Views.Downloads.ResourcePage, ViewModels.Downloads.ResourceViewMo
 pages.WithPage<Views.Downloads.TexturePacks.NavigationPage, ViewModels.Downloads.TexturePacks.NavigationViewModel>("TexturePacksDownload/Navigation");
 pages.WithPage<Views.Downloads.ResourceDefaultPage, ViewModels.Downloads.TexturePacks.DefaultViewModel>("TexturePacksDownload/Default");
 pages.WithPage<Views.Downloads.ResourcePage, ViewModels.Downloads.ResourceViewModel>("TexturePacksDownload/Resource");
+
+pages.WithPage<Views.Downloads.Maps.NavigationPage, ViewModels.Downloads.Maps.NavigationViewModel>("MapsDownload/Navigation");
+pages.WithPage<Views.Downloads.ResourceDefaultPage, ViewModels.Downloads.Maps.DefaultViewModel>("MapsDownload/Default");
+pages.WithPage<Views.Downloads.ResourcePage, ViewModels.Downloads.ResourceViewModel>("MapsDownload/Resource");
 
 pages.WithPage<Views.Downloads.Shaders.NavigationPage, ViewModels.Downloads.Shaders.NavigationViewModel>("ShadersDownload/Navigation");
 pages.WithPage<Views.Downloads.ResourceDefaultPage, ViewModels.Downloads.Shaders.DefaultViewModel>("ShadersDownload/Default");

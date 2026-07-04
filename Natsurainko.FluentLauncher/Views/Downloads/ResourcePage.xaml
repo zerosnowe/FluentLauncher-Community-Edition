@@ -385,6 +385,18 @@
                                     x:Load="{x:Bind VM.LoadingFiles, Mode=OneWay}"
                                     IsActive="{x:Bind VM.LoadingFiles, Mode=OneWay}" />
 
+                                <StackPanel
+                                    x:Name="DependenciesPanel"
+                                    x:Load="{x:Bind VM.ShowDependencies, Mode=OneWay}"
+                                    Loaded="DependenciesPanel_Loaded"
+                                    Spacing="8">
+                                    <TextBlock
+                                        FontWeight="SemiBold"
+                                        Style="{ThemeResource BaseTextBlockStyle}"
+                                        Text="前置模组" />
+                                    <StackPanel x:Name="DependencyResourcesPanel" Spacing="4" />
+                                </StackPanel>
+
                                 <controls:WrapPanel
                                     x:Name="FilesFiltersPanel"
                                     Margin="8,0,0,0"
@@ -446,12 +458,21 @@
                                 </ItemsView.Layout>
                                 <ItemsView.ItemTemplate>
                                     <DataTemplate x:DataType="x:String">
-                                        <ItemContainer>
-                                            <Image Stretch="UniformToFill">
-                                                <Image.Source>
-                                                    <BitmapImage UriSource="{x:Bind}" />
-                                                </Image.Source>
-                                            </Image>
+                                        <ItemContainer Padding="0">
+                                            <Button
+                                                Padding="0"
+                                                HorizontalAlignment="Stretch"
+                                                VerticalAlignment="Stretch"
+                                                Background="Transparent"
+                                                BorderThickness="0"
+                                                Click="Screenshot_Click"
+                                                Tag="{x:Bind}">
+                                                <Image Stretch="UniformToFill">
+                                                    <Image.Source>
+                                                        <BitmapImage UriSource="{x:Bind}" />
+                                                    </Image.Source>
+                                                </Image>
+                                            </Button>
                                         </ItemContainer>
                                     </DataTemplate>
                                 </ItemsView.ItemTemplate>

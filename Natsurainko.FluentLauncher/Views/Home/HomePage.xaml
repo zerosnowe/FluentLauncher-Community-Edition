@@ -476,6 +476,7 @@
                                                 VerticalAlignment="Stretch"
                                                 Background="Transparent"
                                                 BorderThickness="0"
+                                                CornerRadius="12,12,0,0"
                                                 CommandParameter="{x:Bind}">
                                                 <i:Interaction.Behaviors>
                                                     <behaviors:AncestorBindingBehavior

@@ -156,10 +156,46 @@
                 <controls:SettingsCard
                     x:Uid="Instances_InstancePage_Card4"
                     Command="{x:Bind VM.CardClickCommand}"
-                    CommandParameter="Instances/Save"
+                    CommandParameter="Instances/Maps"
                     Description="View and manage your game saves"
-                    Header="Save Management"
+                    Header="Map Management"
                     HeaderIcon="{xh:FontIcon Glyph=&#xE81E;}"
+                    IsClickEnabled="True" />
+
+                <controls:SettingsCard
+                    x:Uid="Instances_InstancePage_Card8"
+                    Command="{x:Bind VM.CardClickCommand}"
+                    CommandParameter="Instances/ResourcePacks"
+                    Description="Import, open, delete and download resource packs"
+                    Header="Resource Pack Management"
+                    HeaderIcon="{xh:FontIcon Glyph=&#xE8B7;}"
+                    IsClickEnabled="True" />
+
+                <controls:SettingsCard
+                    x:Uid="Instances_InstancePage_Card9"
+                    Command="{x:Bind VM.CardClickCommand}"
+                    CommandParameter="Instances/Shaders"
+                    Description="Import, open, delete and download shader packs"
+                    Header="Shader Management"
+                    HeaderIcon="{xh:FontIcon Glyph=&#xE790;}"
+                    IsClickEnabled="True" />
+
+                <controls:SettingsCard
+                    x:Uid="Instances_InstancePage_Card10"
+                    Command="{x:Bind VM.CardClickCommand}"
+                    CommandParameter="Instances/Screenshots"
+                    Description="Preview, locate and delete screenshots"
+                    Header="Screenshot Management"
+                    HeaderIcon="{xh:FontIcon Glyph=&#xE8B9;}"
+                    IsClickEnabled="True" />
+
+                <controls:SettingsCard
+                    x:Uid="Instances_InstancePage_Card11"
+                    Command="{x:Bind VM.CardClickCommand}"
+                    CommandParameter="Instances/Servers"
+                    Description="Locate, backup or reset the server list file"
+                    Header="Server Management"
+                    HeaderIcon="{xh:FontIcon Glyph=&#xE774;}"
                     IsClickEnabled="True" />
 
                 <TextBlock

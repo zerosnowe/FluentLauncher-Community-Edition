@@ -63,8 +63,18 @@ internal abstract partial class ResourceDefaultViewModel(
 
     protected abstract Dictionary<string, int> CurseForgeCategories { get; }
 
+    protected virtual bool SupportsModrinth => true;
+
+    public bool ShowResourceSourceSelector => SupportsModrinth;
+
     partial void OnResourceSourceChanged(int value)
     {
+        if (!SupportsModrinth && value != 0)
+        {
+            ResourceSource = 0;
+            return;
+        }
+
         depressCategoryChangedInvokeSearch = true;
 
         UpdateFiltersSource();
@@ -148,7 +158,7 @@ internal abstract partial class ResourceDefaultViewModel(
                             version: FilteredVersion == LocalizedStrings.ResourceCategories__All ? null : FilteredVersion,
                             slugMode: slugMode,
                             cancellationToken: _cancellationTokenSource.Token)).ToArray(),
-                    1 => (await modrinthClient.SearchResourcesAsync(query, ModrinthResourceType,
+                    1 when SupportsModrinth => (await modrinthClient.SearchResourcesAsync(query, ModrinthResourceType,
                             categories: SelectedCategory == "all" ? null : SelectedCategory,
                             version: FilteredVersion == LocalizedStrings.ResourceCategories__All ? null : FilteredVersion,
                             cancellationToken: _cancellationTokenSource.Token)).ToArray(),

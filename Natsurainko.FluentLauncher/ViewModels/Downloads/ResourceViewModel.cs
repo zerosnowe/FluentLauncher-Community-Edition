@@ -30,6 +30,7 @@ namespace Natsurainko.FluentLauncher.ViewModels.Downloads;
 internal partial class ResourceViewModel(
     GameService gameService,
     DownloadService downloadService,
+    INavigationService navigationService,
     IDialogActivationService<ContentDialogResult> dialogActivationService,
     SearchProviderService searchProviderService,
     CurseForgeClient curseForgeClient,
@@ -39,6 +40,7 @@ internal partial class ResourceViewModel(
     private string _pageKey;
     private object _modResource = null!;
     private BindedSearchProvider _bindedSearchProvider;
+    private int _dependencyLoadVersion;
 
     #region Basic Properties
 
@@ -123,6 +125,22 @@ internal partial class ResourceViewModel(
 
     #endregion
 
+    #region Dependencies
+
+    [ObservableProperty]
+    [NotifyPropertyChangedFor(nameof(HasDependencyResources))]
+    [NotifyPropertyChangedFor(nameof(ShowDependencies))]
+    public partial IEnumerable<object> DependencyResources { get; set; }
+
+    [ObservableProperty]
+    [NotifyPropertyChangedFor(nameof(ShowDependencies))]
+    public partial bool LoadingDependencies { get; set; }
+
+    [ObservableProperty]
+    public partial bool LoadDependenciesFailed { get; set; }
+
+    #endregion
+
     #region Description
 
     [ObservableProperty]
@@ -151,6 +169,10 @@ internal partial class ResourceViewModel(
 
     public bool IsSelectedFile => SelectedFile != null;
 
+    public bool HasDependencyResources => DependencyResources != null && DependencyResources.Any();
+
+    public bool ShowDependencies => LoadingDependencies || HasDependencyResources;
+
     partial void OnSelectedLoaderChanged(string value) => UpdateFilteredFiles();
 
     partial void OnSelectedVersionChanged(string value) => UpdateFilteredFiles();
@@ -159,6 +181,9 @@ internal partial class ResourceViewModel(
     {
         if (TeachingTipOpen)
             TeachingTipOpen = false;
+
+        if (value != null)
+            TryLoadDependencies(value);
     }
 
     void INavigationAware.SetNavigationKey(string key) => _pageKey = key;
@@ -184,6 +209,7 @@ internal partial class ResourceViewModel(
             {
                 CurseForgeResourceType.McMod => "mods",
                 CurseForgeResourceType.TexturePack => "resourcepacks",
+                CurseForgeResourceType.World => "saves",
                 CurseForgeResourceType.Shader => "shaderpacks",
                 _ => null
             };
@@ -223,6 +249,9 @@ internal partial class ResourceViewModel(
     }
 
     void INavigationAware.OnNavigatedFrom() => _bindedSearchProvider?.Dispose();
+
+    [RelayCommand]
+    void ResourceItemInvoke(object mod) => navigationService.NavigateTo(_pageKey!, mod);
 
     [RelayCommand]
     void Download(int option)
@@ -376,6 +405,131 @@ internal partial class ResourceViewModel(
         });
     }
 
+    async void TryLoadDependencies(object file)
+    {
+        int loadVersion = ++_dependencyLoadVersion;
+
+        if (file == null)
+        {
+            await Dispatcher.EnqueueAsync(() =>
+            {
+                LoadingDependencies = false;
+                LoadDependenciesFailed = false;
+                DependencyResources = [];
+            });
+
+            return;
+        }
+
+        await Dispatcher.EnqueueAsync(() =>
+        {
+            LoadingDependencies = true;
+            LoadDependenciesFailed = false;
+            DependencyResources = [];
+        });
+
+        object[] dependencyResources = [];
+
+        try
+        {
+            dependencyResources = file switch
+            {
+                CurseForgeFile curseForgeFile => await GetCurseForgeDependencyResources(curseForgeFile),
+                ModrinthFile modrinthFile => await GetModrinthDependencyResources(modrinthFile),
+                _ => []
+            };
+        }
+        catch
+        {
+            await Dispatcher.EnqueueAsync(() =>
+            {
+                if (loadVersion == _dependencyLoadVersion)
+                    LoadDependenciesFailed = true;
+            });
+        }
+
+        await Dispatcher.EnqueueAsync(() =>
+        {
+            if (loadVersion != _dependencyLoadVersion)
+                return;
+
+            DependencyResources = dependencyResources;
+            LoadingDependencies = false;
+        });
+    }
+
+    async Task<object[]> GetCurseForgeDependencyResources(CurseForgeFile curseForgeFile)
+    {
+        var details = await curseForgeClient.GetFileDetailsAsync(curseForgeFile);
+        var requiredDependencyIds = details.Dependencies
+            .Where(dependency => dependency.RelationType == 3)
+            .Select(dependency => dependency.ModId)
+            .Distinct()
+            .ToArray();
+
+        var resources = new List<object>(requiredDependencyIds.Length);
+        foreach (int resourceId in requiredDependencyIds)
+        {
+            try
+            {
+                resources.Add(await curseForgeClient.GetResourceAsync(resourceId));
+            }
+            catch { }
+        }
+
+        return [.. resources];
+    }
+
+    async Task<object[]> GetModrinthDependencyResources(ModrinthFile modrinthFile)
+    {
+        var requiredProjectIds = modrinthFile.Dependencies
+            .Where(dependency => dependency.DependencyType == "required" && !string.IsNullOrEmpty(dependency.ProjectId))
+            .Select(dependency => dependency.ProjectId!)
+            .Distinct()
+            .ToArray();
+
+        var resources = new List<object>(requiredProjectIds.Length);
+        foreach (string projectId in requiredProjectIds)
+        {
+            try
+            {
+                var project = await modrinthClient.GetProjectFromId(projectId);
+                var resourceType = project.ProjectType switch
+                {
+                    "mod" => ModrinthResourceType.McMod,
+                    "modpack" => ModrinthResourceType.ModPack,
+                    "resourcepack" => ModrinthResourceType.Resourcepack,
+                    "shader" => ModrinthResourceType.Shader,
+                    "datapack" => ModrinthResourceType.DataPack,
+                    "plugin" => ModrinthResourceType.Plugin,
+                    _ => (ModrinthResourceType?)null
+                };
+
+                var resource = (await modrinthClient.SearchResourcesAsync(project.Slug, resourceType))
+                    .FirstOrDefault(resource => resource.Id == project.Id);
+
+                resources.Add(resource ?? new ModrinthResource
+                {
+                    Id = project.Id,
+                    Slug = project.Slug,
+                    ProjectType = project.ProjectType,
+                    Name = project.Name,
+                    Summary = project.Summary,
+                    DownloadCount = project.DownloadCount,
+                    DateModified = project.DateModified,
+                    Author = string.Empty,
+                    Versions = [],
+                    Categories = project.Categories,
+                    ScreenshotUrls = [],
+                    IconUrl = project.IconUrl
+                });
+            }
+            catch { }
+        }
+
+        return [.. resources];
+    }
+
     async void TryLoadDescription()
     {
         await Dispatcher.EnqueueAsync(() => LoadingDescription = true);
@@ -403,18 +557,29 @@ internal partial class ResourceViewModel(
 
     void UpdateFilteredFiles()
     {
+        if (Files == null)
+            return;
+
+        object[] filteredFiles;
+
         if (_modResource is CurseForgeResource)
         {
-            FilteredFiles = [.. Files.Cast<CurseForgeFile>()
+            filteredFiles = [.. Files.Cast<CurseForgeFile>()
                 .Where(f => f.McVersion == SelectedVersion)
                 .Where(f => f.ModLoaderType.ToString() == SelectedLoader)];
         }
         else if (_modResource is ModrinthResource)
         {
-            FilteredFiles = [.. Files.Cast<ModrinthFile>()
+            filteredFiles = [.. Files.Cast<ModrinthFile>()
                 .Where(f => f.McVersion == SelectedVersion)
                 .Where(f => f.Loaders.Contains(SelectedLoader))];
         }
+        else filteredFiles = [];
+
+        FilteredFiles = filteredFiles;
+
+        if (SelectedFile == null || !filteredFiles.Contains(SelectedFile))
+            TryLoadDependencies(filteredFiles.FirstOrDefault());
     }
 
     [GeneratedRegex("[^A-Za-z0-9\\s]")]

@@ -43,7 +43,9 @@
                     Margin="0,0,0,16"
                     HorizontalSpacing="16"
                     VerticalSpacing="16">
-                    <controls:Segmented SelectedIndex="{x:Bind VM.ResourceSource, Mode=TwoWay}">
+                    <controls:Segmented
+                        SelectedIndex="{x:Bind VM.ResourceSource, Mode=TwoWay}"
+                        Visibility="{x:Bind VM.ShowResourceSourceSelector, Mode=OneWay, Converter={StaticResource BoolToVisibilityConverter}}">
                         <controls:SegmentedItem>
                             <StackPanel Orientation="Horizontal" Spacing="8">
                                 <FontIcon FontSize="14" Glyph="&#xe774;" />
