@@ -10,13 +10,15 @@
 ![License](https://img.shields.io/badge/license-MIT-yellow)
 
 #### 专为 Windows 11 设计的 Minecraft 启动器，提供简洁、流畅的视觉体验
-#### 🏪 [Microsoft Store 安装](https://apps.microsoft.com/detail/Natsurianko.FluentLauncher/9p4nqqxq942p) | ⬇️ [希沃云盘 安装](https://pinco.seewo.com/s/780a6209d3074a54af9345aeaed5d08a) | 🔧 [开发文档](https://github.com/Xcube-Studio/Natsurainko.FluentLauncher/wiki/%23-%E5%BC%80%E5%8F%91) | 🚧 [路线图](https://github.com/Xcube-Studio/Natsurainko.FluentLauncher/wiki/%E5%BC%80%E5%8F%91%EF%BC%9A%E8%B7%AF%E7%BA%BF%E5%9B%BE) | 🌐 [本地化 README](README/README_index.md)
+
+#### ⬇️ [Release 获取](https://github.com/zerosnowe/FluentLauncher-Community-Edition/releases) | 🔧 [开发文档](https://github.com/Xcube-Studio/Natsurainko.FluentLauncher/wiki/%23-%E5%BC%80%E5%8F%91) | 🚧 [路线图](https://github.com/Xcube-Studio/Natsurainko.FluentLauncher/wiki/%E5%BC%80%E5%8F%91%EF%BC%9A%E8%B7%AF%E7%BA%BF%E5%9B%BE) | 🌐 [本地化 README](README/README_index.md)
 
 </div>
 
 ## ✨ 功能列表
 
 ### 基本功能
+
 + [x] 管理、安装 Minecraft 实例
 + [x] 独立 Minecraft 实例设置
 + [x] 管理 Minecraft 实例模组、存档
@@ -29,18 +31,22 @@
 + [x] 导入 CurseForge \ Modrinth 格式整合包 
 
 ### 验证方案
+
 + [x] 微软验证
 + [x] Yggdrasil 验证 (外置验证)
 + [x] 离线验证
 
 ### 加载器支持
+
 + [x] 支持安装 Neoforge \ Forge 加载器
 + [x] 支持安装 Fabric 加载器
 + [x] 支持安装 OptiFine 加载器
 + [x] 支持安装 Quilt 加载器
-> ⚠️ 不支持 LiteLoader 加载器
+  
+  > ⚠️ 不支持 LiteLoader 加载器
 
 ### 第三方资源
+
 + [x] 支持从 CurseForge 下载资源
 + [x] 支持从 Modrinth 下载资源
 + [x] 支持 [Bmcl Api](https://bmclapidoc.bangbang93.com/) 第三方镜像源下载
@@ -48,6 +54,7 @@
 + [x] 支持部分资源使用中文检索词
 
 ### 预览通道功能
+
 + [x] 支持启动器应用自更新
 + [x] 部分版本支持加载插件 [^1]
 
@@ -58,14 +65,6 @@
 > 
 > 1. Windows 10.0.19041.0 [^2] 版本及以上的系统  
 > 2. 安装 [.NET 9 运行时](https://dotnet.microsoft.com/zh-cn/download/dotnet/9.0)
-
-### 从 Microsoft Store 安装
-<a href="https://apps.microsoft.com/detail/Natsurianko.FluentLauncher/9p4nqqxq942p"><img src="https://get.microsoft.com/images/en-us%20dark.svg" height="48"/> </a>
-
-### 从 预览通道 安装
-前往仓库 `FluentLauncher.Preview.Installer`  Release 中 [下载](https://github.com/Xcube-Studio/FluentLauncher.Preview.Installer) FluentLauncher.UniversalInstaller 安装向导
-
-> 我们已不再推荐通过手动安装 msixbundle 包，或是使用已弃用的 FluentLauncher.PreviewChannel.PackageInstaller 手动安装更新包，但你仍能从 [此处](https://github.com/Xcube-Studio/Natsurainko.FluentLauncher/wiki/%E5%85%B3%E4%BA%8E%EF%BC%9A%E6%89%8B%E5%8A%A8%E5%AE%89%E8%A3%85%E9%A2%84%E8%A7%88%E7%89%88%E5%90%AF%E5%8A%A8%E5%99%A8%E5%8C%85) 找到说明
 
 ## 💬 获取帮助
 
@@ -85,12 +84,18 @@
 
 </div>
 
-| 分支 | 开发状态 | 信息 |
-| --- | --- | --- |
-| [`main`](https://github.com/Xcube-Studio/Natsurainko.FluentLauncher) | 正处于长期维护和更新。 | [![CI](https://github.com/Xcube-Studio/Natsurainko.FluentLauncher/actions/workflows/ci.yml/badge.svg)](https://github.com/Xcube-Studio/Natsurainko.FluentLauncher/actions/workflows/ci.yml) |
-| [`legacy/old-uwp-edition`](https://github.com/Xcube-Studio/Natsurainko.FluentLauncher/tree/legacy/old-uwp-edition) | 此版本已停止维护，仅留档。| ![](https://img.shields.io/badge/Legacy-Stopped-red) |
+| 分支                                                                                                                 | 开发状态          | 信息                                                                                                                                                                                          |
+| ------------------------------------------------------------------------------------------------------------------ | ------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| [`main`](https://github.com/Xcube-Studio/Natsurainko.FluentLauncher)                                               | 正处于长期维护和更新。   | [![CI](https://github.com/Xcube-Studio/Natsurainko.FluentLauncher/actions/workflows/ci.yml/badge.svg)](https://github.com/Xcube-Studio/Natsurainko.FluentLauncher/actions/workflows/ci.yml) |
+| [`legacy/old-uwp-edition`](https://github.com/Xcube-Studio/Natsurainko.FluentLauncher/tree/legacy/old-uwp-edition) | 此版本已停止维护，仅留档。 | ![](https://img.shields.io/badge/Legacy-Stopped-red)                                                                                                                                        |
 
 ### 主要贡献者
+
+**Community Edition 贡献者**
+
+[@zerosnowe](https://github.com/zerosnowe) ——Community Edition 主要维护者
+
+**原版本贡献者**
 
 **[@ natsurainko](https://github.com/natsurainko)** —— 启动核心、启动器功能实现; 启动器 UI 设计  
 **[@ gaviny82](https://github.com/gaviny82)** —— 启动核心、启动器架构设计  
@@ -114,6 +119,5 @@ _**首先感谢各位贡献者的共同努力**_
 - 感谢 [mcim](https://github.com/mcmod-info-mirror/mcim-api) 提供的 Modrinth 和 Curseforge 上的模组翻译信息  
 - 感谢 [Cloudflare CDN](https://www.cloudflare.com) 提供的云服务
 
-
 [^1]: 并非所有预览版本均支持插件加载器，判断一个预览版本是否支持加载器，请在其发布中查看是否有 `"enableLoadExtensions": true` 的属性
-[^2]: 请参阅 [Windows 10 版本信息](https://learn.microsoft.com/zh-cn/windows/release-health/release-information)
+请参阅 [Windows 10 版本信息](https://learn.microsoft.com/zh-cn/windows/release-health/release-information)
